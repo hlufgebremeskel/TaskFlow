@@ -1,35 +1,51 @@
-import React from 'react';
-import { CheckCircle2, ListTodo, ShieldCheck, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import DashboardLayout from './layouts/DashboardLayout';
+import DashboardPage from './pages/DashboardPage';
+import TasksPage from './pages/TasksPage';
+import CompletedPage from './pages/CompletedPage';
+import CategoriesPage from './pages/CategoriesPage';
+import { MOCK_TASKS, MOCK_CATEGORIES } from './utils/mockData';
 
 export default function App() {
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-center items-center p-6">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-        <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-xl mx-auto flex items-center justify-center mb-5">
-          <ListTodo className="w-8 h-8" />
-        </div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-2">
-          TaskFlow
-        </h1>
-        <p className="text-sm text-slate-500 mb-6">
-          Phase 1 Initialized: React, Vite, Tailwind CSS, & NestJS Monorepo
-        </p>
+  // Central mock state for interactive Phase 2 UI development
+  const [tasks, setTasks] = useState(MOCK_TASKS);
+  const [categories, setCategories] = useState(MOCK_CATEGORIES);
+  const [searchQuery, setSearchQuery] = useState('');
 
-        <div className="space-y-3 text-left">
-          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg text-sm font-medium text-slate-700">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-            <span>Vite + React (JavaScript) Running</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg text-sm font-medium text-slate-700">
-            <Sparkles className="w-5 h-5 text-indigo-500 shrink-0" />
-            <span>Tailwind CSS v3 Configured</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg text-sm font-medium text-slate-700">
-            <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0" />
-            <span>Ready for Phase 2 UI Dashboard</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <DashboardLayout
+              tasks={tasks}
+              setTasks={setTasks}
+              categories={categories}
+              setCategories={setCategories}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          }
+        >
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="tasks" element={<TasksPage />} />
+          <Route
+            path="tasks/today"
+            element={<TasksPage presetFilter={{ mode: 'TODAY' }} />}
+          />
+          <Route
+            path="tasks/upcoming"
+            element={<TasksPage presetFilter={{ mode: 'UPCOMING' }} />}
+          />
+          <Route path="tasks/completed" element={<CompletedPage />} />
+          <Route path="categories" element={<CategoriesPage />} />
+        </Route>
+        {/* Catch-all redirect */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
